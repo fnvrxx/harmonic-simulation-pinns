@@ -1,0 +1,63 @@
+\documentclass[12pt, letterpaper]{article}
+\usepackage{listings} % Paket untuk menampilkan kode
+\usepackage{xcolor}   % Paket untuk mengatur warna
+
+% --- Konfigurasi Warna dan Style ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=C++                     
+}
+
+\lstset{style=mystyle}
+
+\title{Bagaimana Cara PINNs bekerja?\\
+Studi kasus:Oscillator Harmonik Teredam}
+\author{Fajar Adie Santosa(@debug.stack)}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Pendahuluan}
+Projek ini referensi dari : https://github.com/benmoseley/harmonic-oscillator-pinn-workshop\\
+
+Pada penjelasan ini, kita akan membahas bagaimana Physics-Informed Neural Networks (PINNs) bekerja dengan studi kasus \textit{damped harmonic oscillator}. Tujuan utama pada penjelasan ini yakni:\\
+\begin{enumerate}
+    \item Menulis Kode PINNs dari scratch
+    \item Memahami tipe perbedaan antara PINNs dengan Neural Networks biasa
+    \item Memahami lebih detail bagaimana PINNs selama training dan bagaimana PINNs bisa improve performa (konvergen) dengan cepat
+\end{enumerate}
+\subsection{Problem Overview}
+
+%% Nulis code
+% \textbf{Untuk file hello.cpp}:\\
+% \begin{lstlisting}[caption={Contoh Program Hello World}, label={code:hello}]
+% #include <iostream>
+%     int main() {
+%         std::cout << "Hello, World!" << std::endl;
+%         return 0;
+%     }
+% \end{lstlisting}
+
+\end{document}
+
