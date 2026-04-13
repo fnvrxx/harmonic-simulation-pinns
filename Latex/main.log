@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.8.1)  13 APR 2026 21:08
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.8.1)  13 APR 2026 21:35
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -269,23 +269,28 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <7> on input line 42.
 
-Underfull \hbox (badness 10000) in paragraph at lines 44--45
+Overfull \hbox (32.8596pt too wide) in paragraph at lines 44--46
+\OT1/cmr/m/n/12 PR : https://www.mathworks.com/help/deeplearning/ug/solve-partial-differential-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 44--46
 
  []
 
 
-Overfull \hbox (10.42363pt too wide) in paragraph at lines 48--49
+Overfull \hbox (10.42363pt too wide) in paragraph at lines 49--50
 []\OT1/cmr/m/n/12 Memahami lebih de-tail bagaimana PINNs se-lama train-ing dan bagaimana
  []
 
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 54.
+(Font)              <12> on input line 55.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 54.
+(Font)              <8> on input line 55.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 54.
+(Font)              <6> on input line 55.
 
-Underfull \hbox (badness 10000) in paragraph at lines 57--59
+Underfull \hbox (badness 10000) in paragraph at lines 58--60
 
  []
 
@@ -294,16 +299,16 @@ Underfull \hbox (badness 10000) in paragraph at lines 57--59
 [1
 
 {/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Underfull \hbox (badness 10000) in paragraph at lines 63--65
+Underfull \hbox (badness 10000) in paragraph at lines 64--66
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 82--84
+Underfull \hbox (badness 10000) in paragraph at lines 83--85
 
  []
 
-Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 84.
+Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 85.
 
 
 [2]
@@ -314,12 +319,12 @@ Package epstopdf Info: Source file: <exact_sol.eps>
 (epstopdf)                    date: 2026-04-13 21:07:05
 (epstopdf)                    size: 8584 bytes
 (epstopdf)             Command: <repstopdf --outfile=exact_sol-eps-converted-to.pdf exact_sol.eps>
-(epstopdf)             \includegraphics on input line 110.
+(epstopdf)             \includegraphics on input line 111.
 Package epstopdf Info: Output file is already uptodate.
 <exact_sol-eps-converted-to.pdf, id=58, 840.13875pt x 561.09625pt>
 File: exact_sol-eps-converted-to.pdf Graphic file (type pdf)
 <use exact_sol-eps-converted-to.pdf>
-Package pdftex.def Info: exact_sol-eps-converted-to.pdf  used on input line 110.
+Package pdftex.def Info: exact_sol-eps-converted-to.pdf  used on input line 111.
 (pdftex.def)             Requested size: 195.0pt x 130.23093pt.
 
 
@@ -340,7 +345,7 @@ Here is how much of TeX's memory you used:
  1141 hyphenation exceptions out of 8191
  75i,8n,82p,292b,2527s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on main.pdf (3 pages, 147889 bytes).
+Output written on main.pdf (3 pages, 148877 bytes).
 PDF statistics:
  162 PDF objects out of 1000 (max. 8388607)
  125 compressed objects within 2 object streams
