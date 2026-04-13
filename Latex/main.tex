@@ -1,6 +1,9 @@
 \documentclass[12pt, letterpaper]{article}
 \usepackage{listings} % Paket untuk menampilkan kode
 \usepackage{xcolor}   % Paket untuk mengatur warna
+\usepackage{media9}
+\usepackage{graphicx}
+\usepackage{hyperref}
 
 % --- Konfigurasi Warna dan Style ---
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -25,13 +28,12 @@
     showstringspaces=false,
     showtabs=false,                  
     tabsize=2,
-    language=C++                     
+    language=Matlab                     
 }
 
 \lstset{style=mystyle}
 
-\title{Bagaimana Cara PINNs bekerja?\\
-Studi kasus:Oscillator Harmonik Teredam}
+\title{Bagaimana cara PINNs bekerja?}
 \author{Fajar Adie Santosa(@debug.stack)}
 \date{\today}
 
@@ -39,25 +41,75 @@ Studi kasus:Oscillator Harmonik Teredam}
 \maketitle
 
 \section{Pendahuluan}
-Projek ini referensi dari : https://github.com/benmoseley/harmonic-oscillator-pinn-workshop\\
-
 Pada penjelasan ini, kita akan membahas bagaimana Physics-Informed Neural Networks (PINNs) bekerja dengan studi kasus \textit{damped harmonic oscillator}. Tujuan utama pada penjelasan ini yakni:\\
 \begin{enumerate}
-    \item Menulis Kode PINNs dari scratch
+    \item Menulis kode PINNs dari scratch
     \item Memahami tipe perbedaan antara PINNs dengan Neural Networks biasa
     \item Memahami lebih detail bagaimana PINNs selama training dan bagaimana PINNs bisa improve performa (konvergen) dengan cepat
 \end{enumerate}
-\subsection{Problem Overview}
+\section{Problem Overview}
+\subsection{Oscillator Harmonik Teredam}
+Kita akan menyelesaikan masalah oscilator harmonik teredam dengan menggunakan PINNs:
 
-%% Nulis code
-% \textbf{Untuk file hello.cpp}:\\
-% \begin{lstlisting}[caption={Contoh Program Hello World}, label={code:hello}]
-% #include <iostream>
-%     int main() {
-%         std::cout << "Hello, World!" << std::endl;
-%         return 0;
-%     }
-% \end{lstlisting}
+Ini merupakan masalah fisika, yang dimana perpindahan $u(t)$ merupakan fungsi dari waktu oscillator yang bisa kita deskripsikan dengan persamaan diferensial :
+\begin{equation}
+    m \frac{d^2u}{dt^2} + \mu \frac{du}{dt} + ku = 0
+\end{equation}
+dimana $m$ adalah massa, $\mu$ adalah koefisien redaman, dan $k$ adalah konstanta pegas. Kita akan fokus menyelesaikan masalah ini di "under-damped state", yang dimana osilasi menjadi pelan seiring waktu (seperti gambar di atas).\\
 
+Secara matematis, keadaan tersebut bisa ditulis:
+\begin{equation}
+    \delta < \omega_o, \ dimana \ \delta = \frac{\mu} {2m}, \ \omega_o = \sqrt{\frac{k}{m}}
+\end{equation}
+Terlebih lagi, kita memikirkan dengan mengikuti kondisi awal dengan sistem:\\
+\begin{equation}
+    u(t = 0) = 1, \ \frac{du}{dt}(t = 0) = 0.
+\end{equation}
+Untuk kasus ini, kita menggunakan exact solusi yang diberikan oleh:
+\begin{equation}
+    u(t) = e^{-\delta t}(2A \cos(\phi + \omega t)), \quad \omega = \sqrt{\omega_o^2 - \delta^2}
+\end{equation}
+Untuk lebih detail matematis terkait osilator harmonik teredam, dapat dilihat melalui \href{https://beltoforion.de/en/harmonic_oscillator/}{blog ini}.
+
+\subsection{Workflow overview}
+Ada dua langkah utama untuk menyelesaikan masalah ini dengan PINNs:
+\begin{enumerate}
+    \item Kita akan mensimulasikan sistem menggunakan PINNs, yang diberikan kondisi awal (\textit{initial conditions}) dan kondisi batas (\textit{boundary conditions}) 
+    \item Kita akan melakukan \textbf{invert} untuk acuan parameter menggunakan PINNs, diberikan beberapa data noise observasi dari osilator sebenarnya
+    \item Kita akan melakukan investigasi seberapa akurat PINNs dalam memprediksi solusi osilator, dan apakah bisa konvergen dengan cepat
+\end{enumerate}
+\subsection{Simulasi dengan PINNs}
+Pertama kita akan melakukan inisialisasi dengan fungsi bantuan\\
+% Nulis code
+\begin{lstlisting}[caption={Solusi Exact}, label={code:sol_exact}]
+%% Defines the analytical solution to the under-damped harmonic oscillator problem
+% input
+d = 2;
+w0 = 20;
+t = 1;
+time = 0:0.01:t; 
+
+% solution analytic
+w = sqrt(w0^2 - d^2);
+phi = atan(-d/w);
+A = 1/(2*cos(phi));
+sol_cos = cos(phi+w*time);
+sol_exp = exp(-d*time);
+u = sol_exp * 2 * A .* sol_cos;
+
+% plotting
+plot(time, u); % Plot the solution
+xlabel('(s)');
+ylabel('(u)');
+title('Osilator Harmonik Teredam');
+grid on;
+\end{lstlisting}
+menghasilkan plot osilator harmonik sebagai berikut:
+\begin{figure} [h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{exact_sol.eps} % Omit .eps extension for compatibility
+    \caption{Plot solusi osilator harmonik teredam}
+    \label{fig:example}
+\end{figure}
 \end{document}
 
