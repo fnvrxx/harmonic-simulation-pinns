@@ -2,6 +2,8 @@
 \usepackage{listings} % Paket untuk menampilkan kode
 \usepackage{xcolor}   % Paket untuk mengatur warna
 \usepackage{media9}
+\usepackage{amssymb}
+\usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{hyperref}
 
@@ -33,8 +35,8 @@
 
 \lstset{style=mystyle}
 
-\title{Bagaimana cara PINNs bekerja?}
-\author{Fajar Adie Santosa(@debug.stack)}
+\title{Bagaimana \textit{Physics-Informed Neural Networks} (PINNs) bekerja?}
+\author{Fajar Adie Santosa (\href{https://www.instagram.com/debug_stack/}{@debug.stack})}
 \date{\today}
 
 \begin{document}
@@ -42,7 +44,7 @@
 
 \section{Pendahuluan}
 PR : https://www.mathworks.com/help/deeplearning/ug/solve-partial-differential-equations-with-lbfgs-method-and-deep-learning.html\\
-Pada penjelasan ini, kita akan membahas bagaimana Physics-Informed Neural Networks (PINNs) bekerja dengan studi kasus \textit{damped harmonic oscillator}. Tujuan utama pada penjelasan ini yakni:\\
+Pada penjelasan ini, kita akan membahas bagaimana Physics-Informed Neural Networks (PINNs) bekerja dengan studi kasus \textit{damped harmonic oscillator}. Tujuan utama pada penjelasan ini yakni:
 \begin{enumerate}
     \item Menulis kode PINNs dari scratch
     \item Memahami tipe perbedaan antara PINNs dengan Neural Networks biasa
@@ -111,7 +113,26 @@ menghasilkan plot osilator harmonik sebagai berikut:
     \includegraphics[width=0.5\textwidth]{exact_sol.eps} % Omit .eps extension for compatibility
     \caption{Plot solusi osilator harmonik teredam}
     \label{fig:example}
-\end{figure}
+\end{figure}\\
+Langkah selanjutnya, kita akan membuat pelatihan PINNs untuk mensimulasikan sistem osilator harmonik teredam. Langkah yang harus dilakukan adalah:
+\begin{enumerate}
+    \item Inputs: memilih persamaan diferensial dan kondisi awal yang akan digunakan untuk pelatihan PINNs
+    \item Output: Estimasi solusi, $u(t)$
+\end{enumerate}
+PINNs akan melakukan aproksimasi solusi dengan neural network, yang bisa kita definisikan sebagai 
+\begin{equation}
+    u_{PINN}(t;\theta) \approx u(t),
+\end{equation}
+dimana $\theta$ merupakan parameter dari PINN.\\
+Kemudian, kita akan mendefinisikan fungsi loss (\textit{Loss function}) untuk pelatihan PINN yang terdiri:
+\begin{equation}
+\begin{split}
+    \mathcal{L} = & \ (u_{PINN}(t=0;\theta) - 1)^2 + \lambda_{1} (\frac{du_{PINN}}{dt}(t = 0;\theta - 0)^2 \\
+    & + \frac{\lambda_{2}}{N} \sum_{i=1}^{N} (m \frac{d^2u_{PINN}}{dt^2}(t_i;\theta) + \mu \frac{du_{PINN}}{dt}(t_i;\theta) + ku_{PINN}(t_i;\theta))^2
+\end{split}
+\end{equation}
+Untuk latihan kali ini, kita akan menggunakan $\delta = 2, \omega_o = 20$ dan coba untuk mencari solusi dengan domain $t \in [0, 1]$
+\subsubsection{Catatan}
 
 \end{document}
 

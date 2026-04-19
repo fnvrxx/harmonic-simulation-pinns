@@ -1,10 +1,10 @@
 # Physics-Informed Neural Networks Works
 
 Ini adalah penjelasan dari aku bagaimana PINNs bekerja menggunakan program MATLAB. Problem yang aku coba:
-- Harmonik Osilator Teredam
-- Bratu 3 Dimensi
-- Burgers 1 Dimensi
-- Allen Cahn 2 Dimensi
+- [ ] Harmonik Osilator Teredam
+- [ ] Bratu 1 Dimensi dengan C=1
+- [ ] Burgers 1 Dimensi
+
 
 ### Referensi
 
