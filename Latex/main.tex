@@ -6,6 +6,7 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{url}
 
 % --- Konfigurasi Warna dan Style ---
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -42,11 +43,17 @@
 \begin{document}
 \maketitle
 
+\section{Pengertian PINNs}
+\textit{Physics-Informed Neural Networks} (PINNs) merupakan gabungan Neural Networks dengan menggabungkan hukum fisika yang di deskripsikan dengan persamaan diferensial ke dalam fungsi loss untuk proses pelatihan ke arah solusi yang lebih akurat dengan mendasari hukum fisika yang berlaku \cite{matlab}. PINNs bisa digunakan untuk :
+\begin{itemize}
+    \item Pendekatan solusi untuk persamaan diferensial biasa (PDB) dan persamaan diferensial parsial (PDP)
+    \item Menyelesikan \textit{inverse problems}, seperti estimasi parameter model dari data yang terbatas
+\end{itemize}
+%tambahkan gambar ilustrasi PINNS
 \section{Pendahuluan}
-PR : https://www.mathworks.com/help/deeplearning/ug/solve-partial-differential-equations-with-lbfgs-method-and-deep-learning.html\\
-Pada penjelasan ini, kita akan membahas bagaimana Physics-Informed Neural Networks (PINNs) bekerja dengan studi kasus \textit{damped harmonic oscillator}. Tujuan utama pada penjelasan ini yakni:
+Pada penjelasan ini, kita akan membahas bagaimana Physics-Informed Neural Networks (PINNs) bekerja dengan studi kasus \textit{damped harmonic oscillator} yang diadaptasi dari tutorial <link tutorial>. Tujuan utama pada penjelasan ini yakni:
 \begin{enumerate}
-    \item Menulis kode PINNs dari scratch
+    \item Menulis kode PINNs dari scratch (dengan bantuan \textit{toolbox deep learning MATLAB})
     \item Memahami tipe perbedaan antara PINNs dengan Neural Networks biasa
     \item Memahami lebih detail bagaimana PINNs selama training dan bagaimana PINNs bisa improve performa (konvergen) dengan cepat
 \end{enumerate}
@@ -72,67 +79,73 @@ Untuk kasus ini, kita menggunakan exact solusi yang diberikan oleh:
 \begin{equation}
     u(t) = e^{-\delta t}(2A \cos(\phi + \omega t)), \quad \omega = \sqrt{\omega_o^2 - \delta^2}
 \end{equation}
-Untuk lebih detail matematis terkait osilator harmonik teredam, dapat dilihat melalui \href{https://beltoforion.de/en/harmonic_oscillator/}{blog ini}.
+Untuk lebih detail matematis terkait osilator harmonik teredam, dapat dilihat melalui \cite{beltoforion}.
 
 \subsection{Workflow overview}
-Ada dua langkah utama untuk menyelesaikan masalah ini dengan PINNs:
+Untuk menyelesaikan masalah oscilator harmonik teredam dengan menggunakan PINNs, kita akan mengikuti workflow berikut:
 \begin{enumerate}
-    \item Kita akan mensimulasikan sistem menggunakan PINNs, yang diberikan kondisi awal (\textit{initial conditions}) dan kondisi batas (\textit{boundary conditions}) 
-    \item Kita akan melakukan \textbf{invert} untuk acuan parameter menggunakan PINNs, diberikan beberapa data noise observasi dari osilator sebenarnya
-    \item Kita akan melakukan investigasi seberapa akurat PINNs dalam memprediksi solusi osilator, dan apakah bisa konvergen dengan cepat
+    \item Membuat Neural Network 
+    \item Melatih Neural Network dengan opsimasi L-BFGS dan Levenberg-Marquadt
+    \item Membuat loss function yang menggabungkan persamaan diferensial dan kondisi awal menggunakan ansatz (hard constraint) untuk memastikan bahwa solusi yang dihasilkan oleh PINNs memenuhi kondisi awal
+    \item Membuat gradien dari loss function dengan menggunakan automatic differentiation untuk menghitung turunan yang diperlukan dalam persamaan diferensial (seperti $\frac{du}{dt}$ dan $\frac{d^2u}{dt^2}$)
+    \item Melakukan optimasi untuk meminimalkan loss function dengan menggunakan algoritma optimasi seperti L-BFGS atau Levenberg-Marquadt untuk memperbarui parameter dari PINNs
+    \item Mengevaluasi performa PINNs dengan membandingkan solusi yang dihasilkan dengan solusi eksak dan menghitung error untuk menilai akurasi dari PINNs
 \end{enumerate}
-\subsection{Simulasi dengan PINNs}
-Pertama kita akan melakukan inisialisasi dengan fungsi bantuan\\
-% Nulis code
-\begin{lstlisting}[caption={Solusi Exact}, label={code:sol_exact}]
-%% Defines the analytical solution to the under-damped harmonic oscillator problem
-% input
-d = 2;
-w0 = 20;
-t = 1;
-time = 0:0.01:t; 
-
-% solution analytic
-w = sqrt(w0^2 - d^2);
-phi = atan(-d/w);
-A = 1/(2*cos(phi));
-sol_cos = cos(phi+w*time);
-sol_exp = exp(-d*time);
-u = sol_exp * 2 * A .* sol_cos;
-
-% plotting
-plot(time, u); % Plot the solution
-xlabel('(s)');
-ylabel('(u)');
-title('Osilator Harmonik Teredam');
-grid on;
-\end{lstlisting}
-menghasilkan plot osilator harmonik sebagai berikut:
-\begin{figure} [h]
-    \centering
-    \includegraphics[width=0.5\textwidth]{exact_sol.eps} % Omit .eps extension for compatibility
-    \caption{Plot solusi osilator harmonik teredam}
-    \label{fig:example}
-\end{figure}\\
-Langkah selanjutnya, kita akan membuat pelatihan PINNs untuk mensimulasikan sistem osilator harmonik teredam. Langkah yang harus dilakukan adalah:
-\begin{enumerate}
-    \item Inputs: memilih persamaan diferensial dan kondisi awal yang akan digunakan untuk pelatihan PINNs
-    \item Output: Estimasi solusi, $u(t)$
-\end{enumerate}
-PINNs akan melakukan aproksimasi solusi dengan neural network, yang bisa kita definisikan sebagai 
+Untuk rumus ansatz yang digunakan yakni $u_{PINN} = 1 + t^2 \cdot \mathcal{N}(t;\theta)$ yang dimana $\mathcal{N}(t;\theta)$ adalah neural network dengan parameter $\theta$. Kemudian, kita akan mendefinisikan fungsi loss (\textit{Loss function}) untuk pelatihan PINN yang terdiri:
 \begin{equation}
-    u_{PINN}(t;\theta) \approx u(t),
+    \mathcal{L} = 
 \end{equation}
-dimana $\theta$ merupakan parameter dari PINN.\\
-Kemudian, kita akan mendefinisikan fungsi loss (\textit{Loss function}) untuk pelatihan PINN yang terdiri:
-\begin{equation}
-\begin{split}
-    \mathcal{L} = & \ (u_{PINN}(t=0;\theta) - 1)^2 + \lambda_{1} (\frac{du_{PINN}}{dt}(t = 0;\theta - 0)^2 \\
-    & + \frac{\lambda_{2}}{N} \sum_{i=1}^{N} (m \frac{d^2u_{PINN}}{dt^2}(t_i;\theta) + \mu \frac{du_{PINN}}{dt}(t_i;\theta) + ku_{PINN}(t_i;\theta))^2
-\end{split}
-\end{equation}
-Untuk latihan kali ini, kita akan menggunakan $\delta = 2, \omega_o = 20$ dan coba untuk mencari solusi dengan domain $t \in [0, 1]$
-\subsubsection{Catatan}
+%% \subsection{Simulasi dengan PINNs}
+% Langkah selanjutnya, kita akan membuat pelatihan PINNs untuk mensimulasikan sistem osilator harmonik teredam. Langkah yang harus dilakukan adalah:
+% \begin{enumerate}
+%     \item Inputs: memilih persamaan diferensial dan kondisi awal yang akan digunakan untuk pelatihan PINNs
+%     \item Output: Estimasi solusi, $u(t)$
+% \end{enumerate}
+% PINNs akan melakukan aproksimasi solusi dengan neural network, yang bisa kita definisikan sebagai 
+% \begin{equation}
+%     u_{PINN}(t;\theta) \approx u(t),
+% \end{equation}
+% dimana $\theta$ merupakan parameter dari PINN.\\
+% Kemudian, kita akan mendefinisikan fungsi loss (\textit{Loss function}) untuk pelatihan PINN yang terdiri:
+% \begin{equation}
+% \begin{split}
+%     \mathcal{L} = & \ (u_{PINN}(t=0;\theta) - 1)^2 + \lambda_{1} (\frac{du_{PINN}}{dt}(t = 0;\theta - 0)^2 \\
+%     & + \frac{\lambda_{2}}{N} \sum_{i=1}^{N} (m \frac{d^2u_{PINN}}{dt^2}(t_i;\theta) + \mu \frac{du_{PINN}}{dt}(t_i;\theta) + ku_{PINN}(t_i;\theta))^2
+% \end{split}
+% \end{equation}
+% Untuk latihan kali ini, kita akan menggunakan $\delta = 2, \omega_o = 20$ dan coba untuk mencari solusi dengan domain $t \in [0, 1]$
+% \subsubsection{Catatan}
+
+\begin{thebibliography}{99}
+\bibitem{matlab}
+MathWorks,
+\textit{MATLAB Documentation},
+\url{https://www.mathworks.com/discovery/physics-informed-neural-networks.html}
+\bibitem{raissi2019}
+M. Raissi, P. Perdikaris, dan G. E. Karniadakis,
+\textit{Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations},
+Journal of Computational Physics, vol. 378, hal. 686--707, 2019.
+\url{https://doi.org/10.1016/j.jcp.2018.10.045}
+
+\bibitem{lagaris1998}
+I. E. Lagaris, A. Likas, dan D. I. Fotiadis,
+\textit{Artificial neural networks for solving ordinary and partial differential equations},
+IEEE Transactions on Neural Networks, vol. 9, no. 5, hal. 987--1000, 1998.
+\url{https://doi.org/10.1109/72.712178}
+
+\bibitem{mathworks2024}
+MathWorks,
+\textit{Solve Partial Differential Equations with L-BFGS Method and Deep Learning},
+MATLAB Documentation, 2024.
+\url{https://www.mathworks.com/help/deeplearning/ug/solve-partial-differential-equations-with-lbfgs-method-and-deep-learning.html}
+
+\bibitem{beltoforion}
+B. Umläuft,
+\textit{The Harmonic Oscillator},
+beltoforion.de, diakses 2024.
+\url{https://beltoforion.de/en/harmonic_oscillator/}
+
+\end{thebibliography}
 
 \end{document}
 

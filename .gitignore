@@ -1,4 +1,6 @@
 .DS_Store
+.env
+.venv
 Latex/main.log
 Latex/main.tex
 Latex/main.synctex.gz
