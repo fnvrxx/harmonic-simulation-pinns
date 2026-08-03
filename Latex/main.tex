@@ -6,9 +6,21 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{url}
+\usepackage{float}
+\usepackage{tikz}
 
 \emergencystretch=3em
 \Urlmuskip=0mu plus 1mu
+
+% --- Style pendukung ilustrasi TikZ Neural Network ---
+\definecolor{mygreen}{RGB}{0,140,80}
+\definecolor{myblue}{RGB}{0,90,160}
+\definecolor{myred}{RGB}{180,0,0}
+
+\tikzset{
+    nnnode/.style={circle, draw, minimum size=0.8cm, inner sep=0pt},
+    nnconnect/.style={-, thick, gray},
+}
 
 % --- Konfigurasi Warna dan Style ---
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -53,33 +65,163 @@
 \section{Pengertian PINNs}
 % ============================================================
 
-\textit{Physics-Informed Neural Networks} (PINNs) merupakan gabungan antara
-\textit{neural networks} dengan hukum fisika yang dideskripsikan melalui
-persamaan diferensial. Hukum fisika tersebut dimasukkan ke dalam fungsi
-\textit{loss} selama proses pelatihan, sehingga solusi yang dihasilkan tetap
-konsisten dengan persamaan diferensial yang berlaku \cite{matlab}. PINNs dapat
-digunakan untuk:
+\textit{Physics-Informed Neural Networks} (PINNs) adalah metode yang
+menggabungkan \textit{neural network} dengan pengetahuan tentang hukum fisika atau persamaan diferensial. Pada
+\textit{neural network} biasa, model belajar dengan melihat banyak pasangan data
+masukan dan keluaran. PINNs tidak hanya belajar dari data, tetapi juga belajar
+dari persamaan diferensial yang menjelaskan perilaku sistem \cite{matlab}.
+
+Secara sederhana, \textit{neural network} pada PINNs berperan sebagai fungsi pendekatan atau \textit{approximation function}.
+Misalnya, jika solusi yang ingin dicari adalah perpindahan benda terhadap waktu
+$u(t)$, \textit{neural network} menerima waktu $t$ sebagai masukan dan menghasilkan perkiraan
+perpindahan $\hat{u}(t)$ sebagai keluaran. Nilai keluaran ini belum tentu benar
+pada awal pelatihan. Oleh karena itu, PINNs memeriksa apakah $\hat{u}(t)$
+memenuhi persamaan diferensial, syarat awal, dan syarat batas dari masalah yang
+sedang diselesaikan.
+
+Untuk melakukan pemeriksaan tersebut, PINNs perlu menghitung turunan dari
+keluaran \textit{neural network} terhadap masukannya. Pada contoh perpindahan, turunan pertama
+$d\hat{u}/dt$ menyatakan kecepatan dan turunan kedua
+$d^2\hat{u}/dt^2$ menyatakan percepatan. Turunan-turunan ini dihitung
+menggunakan \textit{Automatic Differentiation} (AD).
+AD berbeda dengan pendekatan beda hingga yang memperkirakan turunan dari
+selisih nilai pada beberapa titik. AD menghitung turunan berdasarkan struktur
+fungsi \textit{neural network}, sehingga diperlukan proses optimasi atau proses \textit{backpropagation}. Hasil turunan tersebut
+kemudian dimasukkan ke persamaan diferensial. Sebagai contoh, untuk osilator
+harmonik teredam, PINNs membentuk residual
+\begin{equation}
+    \mathcal{R}(t)
+    =m\frac{d^2\hat{u}}{dt^2}
+    +\mu\frac{d\hat{u}}{dt}
+    +k\hat{u}(t).
+\end{equation}
+Apabila residual belum mendekati nol, parameter \textit{neural network} (bobot dan bias) diperbarui agar nilai residual semakin kecil.
+
+Ketidaksesuaian antara prediksi dan hukum fisika disebut \textit{residual}. Residual dimasukkan ke dalam fungsi \textit{loss}. Jika
+residual masih besar, berarti prediksi masih banyak melanggar persamaan fisika. Proses pelatihan mengubah bobot dan bias agar nilai
+\textit{loss} semakin kecil. Dengan cara ini, diarahkan untuk menghasilkan fungsi yang mendekati solusi persamaan diferensial.
+
+Keunggulan PINNs adalah kemampuannya belajar ketika data pengamatan hanya tersedia dalam jumlah sedikit atau bahkan tidak tersedia di seluruh domain. Persamaan diferensial memberikan informasi tambahan tentang bentuk solusi. Meskipun demikian, hasil PINNs tetap merupakan solusi pendekatan, sehingga akurasinya perlu diperiksa melalui residual, syarat batas, dan data pembanding jika tersedia.
+
+PINNs dapat digunakan untuk:
 \begin{itemize}
-    \item Pendekatan solusi untuk persamaan diferensial biasa (PDB) dan
+    \item Mencari pendekatan solusi persamaan diferensial biasa (PDB) dan
           persamaan diferensial parsial (PDP).
+    \item Menggabungkan data pengamatan yang terbatas dengan hukum fisika.
     \item Menyelesaikan \textit{inverse problems}, seperti estimasi parameter
-          model dari data yang terbatas.
+          fisika yang belum diketahui berdasarkan data pengamatan.
 \end{itemize}
 
+\begin{figure}[H]
+    \centering
+\begin{tikzpicture}[x=2.2cm,y=1.0cm]
+  % Layer 1: input (3 node)
+  \foreach \i in {1,...,3}{
+    \pgfmathsetmacro{\y}{3/2-\i+0.5}
+    \node[nnnode, mygreen!60!black, draw=mygreen!60!black, fill=mygreen!15]
+      (N1-\i) at (1,\y) {$x_{\i}$};
+  }
+  % Layer 2: hidden pertama (4 node)
+  \foreach \i in {1,...,4}{
+    \pgfmathsetmacro{\y}{4/2-\i+0.5}
+    \node[nnnode, myblue!60!black, draw=myblue!60!black, fill=myblue!15]
+      (N2-\i) at (2,\y) {$a_{\i}^{(1)}$};
+    \foreach \j in {1,...,3}{
+      \draw[nnconnect] (N1-\j) -- (N2-\i);
+    }
+  }
+  % Layer 3: hidden kedua (4 node)
+  \foreach \i in {1,...,4}{
+    \pgfmathsetmacro{\y}{4/2-\i+0.5}
+    \node[nnnode, myblue!60!black, draw=myblue!60!black, fill=myblue!15]
+      (N3-\i) at (3,\y) {$a_{\i}^{(2)}$};
+    \foreach \j in {1,...,4}{
+      \draw[nnconnect] (N2-\j) -- (N3-\i);
+    }
+  }
+  % Layer 4: output (2 node)
+  \foreach \i in {1,...,2}{
+    \pgfmathsetmacro{\y}{2/2-\i+0.5}
+    \node[nnnode, myred!60!black, draw=myred!60!black, fill=myred!15]
+      (N4-\i) at (4,\y) {$y_{\i}$};
+    \foreach \j in {1,...,4}{
+      \draw[nnconnect] (N3-\j) -- (N4-\i);
+    }
+  }
+  % LABELS
+  \node[above=0.6cm, align=center, mygreen!60!black] at (N1-1.north) {input\\[-0.2em]layer};
+  \node[above=0.6cm, align=center, myblue!60!black] at (N2-1.north) {hidden\\[-0.2em]layers};
+  \node[above=0.6cm, align=center, myred!60!black] at (N4-1.north) {output\\[-0.2em]layer};
+\end{tikzpicture}
+    \caption{Ilustrasi \textit{fully connected network} (FCN) dengan satu \textit{input layer}, dua \textit{hidden layer}, dan satu \textit{output layer}. Setiap $a_i^{(l)}$ merupakan keluaran neuron ke-$i$ pada lapisan tersembunyi ke-$l$.}
+    \label{fig:neural-network}
+\end{figure}
+
+\begin{figure} [H]
+  \centering
+  \includegraphics[width=1\textwidth]{arsitektur-pinn.pdf}
+  \caption{Arsitektur PINNs}
+  \label{fig:perceptron}
+\end{figure}
 % ============================================================
 \section{Konsep Dasar PINNs}
 % ============================================================
 
-\subsection{Arsitektur Neural Network}
+Cara kerja PINNs dapat dipahami sebagai proses menebak, memeriksa, lalu
+memperbaiki solusi. Pertama, \textit{neural network} menghasilkan tebakan solusi pada
+suatu masukan, misalnya posisi $x$ atau waktu $t$. Kedua, turunan dari tebakan
+tersebut dihitung dan dimasukkan ke persamaan diferensial. Ketiga, hasil
+pemeriksaan ini digunakan untuk memperbaiki parameter (bobot dan bias). Proses tersebut
+diulang sampai residual terhadap persamaan diferensial menjadi cukup kecil.
 
+Sebagai contoh, misalkan suatu masalah memiliki persamaan
+\begin{equation}
+    \frac{d^2u}{dx^2}+f(x)=0.
+\end{equation}
+\textit{neural network} menghasilkan pendekatan $u_{nn}(x;\theta)$, yang dimana $\theta = \{W^{(l)},b^{(l)},\dots\}$. PINNs kemudian menghitung turunan kedua \textit{neural network} dan membentuk residual
+\begin{equation}
+    \mathcal{R}(x)=\frac{d^2u_{nn}}{dx^2}+f(x).
+\end{equation}
+Jika $\mathcal{R}(x)$ mendekati nol pada banyak titik di dalam domain, berarti
+prediksi \textit{neural network} semakin sesuai dengan persamaan tersebut.
+
+\subsection{Arsitektur Neural Network}
 Andaikan $u_{nn}(x;\theta)$ merupakan keluaran dari \textit{neural network}
-dengan parameter $\theta$. Secara umum, PINNs menggunakan arsitektur
+dengan parameter $\theta$. Parameter $\theta$ mewakili seluruh bobot dan bias
+yang dapat diubah selama pelatihan/\textit{training}. Secara umum, PINNs menggunakan arsitektur
 \textit{fully connected network} (FCN) dengan fungsi aktivasi $\tanh$:
 \begin{equation}
-    u_{nn}(x;\theta) = W_L \sigma(W_{L-1} \cdots \sigma(W_1 x + b_1) \cdots + b_{L-1}) + b_L
+    u_{nn}(x;\theta) = W^{(L)} \sigma(W^{(L-1)} \cdots \sigma(W^{(1)} x + b^{(1)}) \cdots + b^{(L-1)}) + b^{(L)}
 \end{equation}
-di mana $W_i$ dan $b_i$ masing-masing adalah bobot dan bias pada lapisan ke-$i$,
-dan $\sigma$ adalah fungsi aktivasi.
+di mana $W^{(i)}$ dan $b^{(i)}$ masing-masing adalah bobot dan bias pada lapisan ke-$i$,
+dan $\sigma$ adalah fungsi aktivasi. Aktivasi $\tanh$ sering digunakan karena
+bersifat halus dan dapat diturunkan berulang kali. Sifat ini penting karena
+residual persamaan diferensial dapat memerlukan turunan pertama, kedua, atau
+turunan dengan orde yang lebih tinggi.
+
+\subsection{Menerapkan Syarat Batas dan Syarat Awal}
+
+Fungsi \textit{loss} yang hanya memuat residual persamaan diferensial, seperti pada persamaan sebelumnya, belum menjamin solusi memenuhi syarat batas atau syarat awal dari
+masalah yang diselesaikan. Residual persamaan diferensial hanya mengukur seberapa konsisten
+$u_{nn}(x;\theta)$ terhadap persamaan diferensial di titik-titik kolokasi
+bagian dalam domain, sedangkan syarat batas dan syarat awal merupakan
+informasi tambahan yang berlaku pada titik-titik tertentu, misalnya $x=a$,
+$x=b$, atau $t=0$. Tanpa mekanisme khusus, \textit{neural network} dapat saja
+menghasilkan fungsi yang residual persamaan diferensialnya kecil di seluruh domain, tetapi nilainya tidak sesuai dengan syarat batas maupun syarat awal yang diinginkan.
+Oleh karena itu, PINNs memerlukan cara untuk memasukkan informasi syarat
+batas dan syarat awal ke dalam proses pelatihan.
+
+Terdapat dua pendekatan umum yang digunakan untuk tujuan ini, yaitu
+\textit{hard constraint} dan \textit{soft constraint}. Pada \textit{hard
+constraint}, keluaran \textit{neural network} dimodifikasi secara aljabar sedemikian rupa
+sehingga syarat batas atau syarat awal otomatis terpenuhi untuk nilai
+parameter $\theta$ berapa pun, sehingga tidak perlu ditambahkan komponen
+\textit{loss} khusus untuk itu. Sebaliknya, pada \textit{soft constraint},
+keluaran \textit{neural network} tidak diubah bentuknya; syarat batas maupun syarat awal
+dimasukkan sebagai penalti tambahan dalam fungsi \textit{loss}, sehingga
+pemenuhannya bergantung pada proses optimasi dan hanya dijamin secara
+pendekatan. Kedua subbagian berikut menjelaskan masing-masing pendekatan
+secara lebih rinci beserta kelebihan dan kekurangannya.
 
 \subsection{Hard Constraint}
 
@@ -100,9 +242,9 @@ syarat batas dimasukkan ke dalam fungsi \textit{loss} sebagai penalti:
     \mathcal{L} = \mathcal{L}_{PDE} + \lambda_{BC}\mathcal{L}_{BC}
 \end{equation}
 dengan $\lambda_{BC}$ sebagai bobot penalti untuk syarat batas. Berbeda dengan
-\textit{hard constraint}, keluaran jaringan tidak dipaksa memenuhi syarat batas
-secara aljabar. Jaringan tetap menghasilkan aproksimasi langsung
-$u_{nn}(x;\theta)$, kemudian pelatihan diarahkan agar residual PDE dan residual
+\textit{hard constraint}, keluaran \textit{neural network} tidak dipaksa memenuhi syarat batas
+secara aljabar. \textit{neural network} tetap menghasilkan aproksimasi langsung
+$u_{nn}(x;\theta)$, kemudian pelatihan diarahkan agar residual persamaan diferensial dan residual
 syarat batas sama-sama kecil.
 
 Misalnya untuk masalah satu dimensi dengan syarat batas Dirichlet
@@ -138,11 +280,7 @@ Dengan demikian, bentuk umum \textit{loss} pada PINNs dengan
     +
     \lambda_{IC}\mathcal{L}_{IC},
 \end{equation}
-di mana setiap $\lambda$ mengatur seberapa besar prioritas masing-masing
-komponen selama optimasi. Nilai $\lambda$ yang terlalu kecil dapat membuat
-syarat batas atau syarat awal tidak terpenuhi dengan baik, sedangkan nilai yang
-terlalu besar dapat membuat pelatihan terlalu fokus pada syarat batas dan
-mengabaikan residual PDE di domain.
+Nilai $\lambda$ yang terlalu kecil dapat membuat syarat batas atau syarat awal tidak terpenuhi dengan baik.
 
 Keuntungan utama \textit{soft constraint} adalah bentuknya lebih fleksibel
 karena tidak perlu merancang fungsi pembentuk seperti $p(x)$ pada
@@ -172,14 +310,14 @@ atas tahapan berikut:
 \begin{enumerate}
     \item Menentukan persamaan diferensial, domain, serta syarat batas atau
           syarat awal dari masalah fisika.
-    \item Membentuk jaringan saraf $u_{nn}(\mathbf{x};\theta)$ sebagai
+    \item Membentuk \textit{neural network} $u_{nn}(\mathbf{x};\theta)$ sebagai
           aproksimasi solusi. Jika digunakan \textit{hard constraint}, keluaran
-          jaringan terlebih dahulu dikalikan atau dijumlahkan dengan fungsi
+          \textit{neural network} terlebih dahulu dikalikan atau dijumlahkan dengan fungsi
           pembatas yang sesuai.
     \item Memilih titik kolokasi di dalam domain. Titik ini tidak harus
           memiliki label solusi karena digunakan untuk mengevaluasi residual
           persamaan diferensial.
-    \item Menghitung turunan keluaran jaringan terhadap masukan menggunakan
+    \item Menghitung turunan keluaran \textit{neural network} terhadap masukan menggunakan
           \textit{automatic differentiation}, kemudian menyusun residual
           $\mathcal{R}$.
     \item Meminimalkan rata-rata kuadrat residual, serta komponen \textit{loss}
@@ -188,20 +326,13 @@ atas tahapan berikut:
           analitik menggunakan metrik galat.
 \end{enumerate}
 
-Perbedaan utama PINNs dan jaringan saraf biasa terletak pada informasi yang
-digunakan selama pelatihan. Jaringan saraf biasa terutama memerlukan pasangan
-masukan--target $(x_i,y_i)$, sedangkan PINNs juga dapat belajar dari titik
-kolokasi tanpa target melalui residual hukum fisika. Dengan demikian, gradien
-parameter jaringan tidak hanya membawa informasi kecocokan terhadap data,
-tetapi juga ketidakpatuhan solusi terhadap persamaan diferensial.
-
 % ============================================================
 \section{Problem 1: Persamaan Poisson 1D}
 % ============================================================
 
 \subsection{Problem Setup}
 
-\textbf{PDE:}
+\textbf{Persamaan Diferensial:}
 \begin{equation}
     \frac{\partial^2 y}{\partial x^2} + \pi^2 \sin(\pi x) = 0, \quad x \in [-1, 1]
 \end{equation}
@@ -225,7 +356,7 @@ persamaan diferensial didefinisikan sebagai:
 \end{equation}
 Karena menggunakan \textit{hard constraint} dengan $p(x) = 1 - x^2$, syarat
 batas $y(\pm 1) = 0$ dipenuhi secara otomatis. Sehingga fungsi \textit{loss}
-hanya terdiri atas residual PDE:
+hanya terdiri atas residual persamaan diferensial:
 \begin{equation}
     \mathcal{L} = \mathcal{L}_{PDE} = \frac{1}{N} \sum_{i=1}^{N} \mathcal{R}(x_i)^2
 \end{equation}
@@ -239,11 +370,11 @@ $\frac{\partial^2 y_{nn}}{\partial x^2}$ melalui \texttt{tf.GradientTape}.
 
 \subsection{Penjelasan Kode Langkah demi Langkah}
 
-\subsubsection{Membangun jaringan dan menerapkan syarat batas}
+\subsubsection{Membangun neural network dan menerapkan syarat batas}
 
 Fungsi \texttt{build\_fcn} menerima daftar ukuran lapisan. Dua lapisan
 tersembunyi menggunakan aktivasi $\tanh$, sedangkan lapisan keluaran bersifat
-linear. Keluaran mentah jaringan kemudian dikalikan dengan $1-x^2$.
+linear. Keluaran mentah \textit{neural network} kemudian dikalikan dengan $1-x^2$.
 
 \begin{lstlisting}[caption={FCN dan hard constraint pada masalah Poisson}]
 inputs = tf.keras.Input(shape=(layer_sizes[0],))
@@ -261,16 +392,9 @@ model = Model(inputs=inputs, outputs=outputs)
 \end{lstlisting}
 
 Pada $x=-1$ maupun $x=1$, faktor $1-x^2$ bernilai nol. Oleh sebab itu,
-\texttt{model(x)} selalu memenuhi $y(-1)=y(1)=0$ untuk nilai parameter jaringan
+\texttt{model(x)} selalu memenuhi $y(-1)=y(1)=0$ untuk nilai parameter \textit{neural network}
 apa pun.
 
-\textbf{Catatan implementasi:} cell asli juga memuat baris
-\texttt{model = models.Sequential()}, tetapi modul \texttt{models} tidak
-diimpor dan objek tersebut tidak dipakai. Jika notebook dijalankan ulang dari
-awal, baris itu perlu dihapus atau impor yang sesuai perlu ditambahkan. Uraian
-di atas mengikuti Functional API yang benar-benar dikembalikan oleh fungsi,
-yaitu \texttt{Model(inputs=inputs, outputs=outputs)}. Berkas notebook tidak
-diubah dalam penyusunan dokumen ini.
 
 \subsubsection{Menghitung residual dengan automatic differentiation}
 
@@ -342,7 +466,7 @@ l2_error = (np.linalg.norm(y_pred - y_analytic)
 
 \subsection{Problem Setup}
 
-\textbf{PDE:}
+\textbf{Persamaan Diferensial:}
 \begin{equation}
     \frac{d^2 u}{d x^2} + C e^{u} = 0, \quad x \in (0, 1)
 \end{equation}
@@ -392,7 +516,7 @@ Solusi dibentuk dengan fungsi pembatas:
 Karena $x(1-x)=0$ pada $x=0$ dan $x=1$, maka syarat batas
 $u(0)=u(1)=0$ terpenuhi secara otomatis.
 &
-Solusi langsung diambil dari keluaran jaringan:
+Solusi langsung diambil dari keluaran \textit{neural network}:
 \[
     \hat{u}(x;\theta) = u_{nn}(x;\theta).
 \]
@@ -400,7 +524,7 @@ Syarat batas tidak dipaksa secara aljabar, tetapi dimasukkan sebagai penalti
 dalam fungsi \textit{loss}.
 \\
 \hline
-Fungsi \textit{loss} hanya memuat residual PDE:
+Fungsi \textit{loss} hanya memuat residual persamaan diferensial:
 \[
     \mathcal{L}
     =
@@ -409,7 +533,7 @@ Fungsi \textit{loss} hanya memuat residual PDE:
     \frac{1}{N}\sum_{i=1}^{N}\mathcal{R}(x_i)^2.
 \]
 &
-Fungsi \textit{loss} memuat residual PDE dan residual syarat batas:
+Fungsi \textit{loss} memuat residual persamaan diferensial dan residual syarat batas:
 \[
     \mathcal{L}
     =
@@ -431,7 +555,7 @@ Syarat batas dipenuhi secara eksak, sehingga tidak perlu memilih bobot
 \textit{loss} untuk syarat batas.
 &
 Syarat batas dipenuhi secara pendekatan. Nilai $\lambda_{BC}$ perlu dipilih
-dengan hati-hati agar model tidak terlalu mengabaikan PDE maupun syarat batas.
+dengan hati-hati agar model tidak terlalu mengabaikan persamaan diferensial maupun syarat batas.
 \\
 \hline
 \end{tabular}
@@ -448,8 +572,8 @@ Turunan dihitung menggunakan \textit{automatic differentiation} dari PyTorch.
 
 \subsubsection{Membangun model dengan hard constraint}
 
-Kelas \texttt{PINN} membentuk jaringan $[1,20,20,1]$. Metode
-\texttt{forward} mengalikan keluaran mentah jaringan dengan $x(1-x)$ sehingga
+Kelas \texttt{PINN} membentuk \textit{neural network} $[1,20,20,1]$. Metode
+\texttt{forward} mengalikan keluaran mentah \textit{neural network} dengan $x(1-x)$ sehingga
 kedua syarat batas selalu terpenuhi.
 
 \begin{lstlisting}[caption={Arsitektur PINN untuk persamaan Bratu}]
@@ -618,7 +742,7 @@ dapat dilihat pada \cite{beltoforion}.
 
 Berbeda dengan masalah Poisson dan Bratu, notebook osilator tidak menggunakan
 \textit{hard constraint}. Aproksimasi solusi diambil langsung dari keluaran
-jaringan,
+\textit{neural network},
 \begin{equation}
     \hat{u}(t;\theta)=u_{nn}(t;\theta).
 \end{equation}
@@ -680,7 +804,7 @@ Model menggunakan tiga lapisan tersembunyi dengan 25 neuron pada setiap
 lapisan dan aktivasi $\tanh$. Lapisan keluaran bersifat linear, sehingga
 arsitekturnya adalah $[1,25,25,25,1]$.
 
-\begin{lstlisting}[caption={Arsitektur jaringan pada notebook osilator}]
+\begin{lstlisting}[caption={Arsitektur neural network pada notebook osilator}]
 self.net = nn.Sequential(
     nn.Linear(1, n_hidden), nn.Tanh(),
     nn.Linear(n_hidden, n_hidden), nn.Tanh(),
@@ -695,7 +819,7 @@ model = PINN(n_hidden=25).to(device)
 \end{lstlisting}
 
 Bobot dan bias lapisan keluaran selanjutnya dikalikan $0.01$. Seperti pada
-masalah Bratu, langkah ini membuat prediksi awal jaringan beramplitudo kecil.
+masalah Bratu, langkah ini membuat prediksi awal \textit{neural network} beramplitudo kecil.
 
 \subsubsection{Mendefinisikan data loss dan physics loss}
 
@@ -805,7 +929,7 @@ l2_error = (torch.linalg.norm(u_pred - u_analytic)
 MSE = torch.mean((u_pred - u_analytic)**2)
 \end{lstlisting}
 
-Plot terakhir membandingkan solusi analitik, prediksi jaringan, data berlabel,
+Plot terakhir membandingkan solusi analitik, prediksi \textit{neural network}, data berlabel,
 dan lokasi evaluasi residual fisika. Plot \textit{loss} dalam skala logaritmik
 digunakan untuk melihat laju konvergensi selama evaluasi optimizer.
 
