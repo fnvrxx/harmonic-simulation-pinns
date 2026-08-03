@@ -1,20 +1,70 @@
 \relax 
-\providecommand\pbs@newkey[2]{}
-\providecommand\pbs@seq@push@cx[2]{}
-\providecommand\mix@newkey[2]{}
 \providecommand\hyper@newdestlabel[2]{}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
 \citation{matlab}
-\@writefile{toc}{\contentsline {section}{\numberline {1}Pengertian PINNs}{1}{section.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {2}Pendahuluan}{1}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {1}Pengertian PINNs}{4}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Konsep Dasar PINNs}{4}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Arsitektur Neural Network}{4}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Hard Constraint}{4}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Soft Constraint}{5}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Fungsi Loss}{6}{subsection.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Tahapan Kerja PINNs}{6}{subsection.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Problem 1: Persamaan Poisson 1D}{7}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Problem Setup}{7}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Syarat Batas}{7}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Solusi Analitik}{7}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Loss Residual}{7}{subsection.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Arsitektur dan Optimasi}{7}{subsection.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6}Penjelasan Kode Langkah demi Langkah}{8}{subsection.3.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.6.1}Membangun jaringan dan menerapkan syarat batas}{8}{subsubsection.3.6.1}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {1}FCN dan hard constraint pada masalah Poisson}{8}{lstlisting.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.6.2}Menghitung residual dengan automatic differentiation}{8}{subsubsection.3.6.2}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2}Residual Poisson dan loss PDE}{8}{lstlisting.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.6.3}Menyiapkan titik kolokasi dan melakukan optimasi}{9}{subsubsection.3.6.3}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3}Titik kolokasi dan pelatihan Poisson}{9}{lstlisting.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.6.4}Evaluasi solusi}{9}{subsubsection.3.6.4}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4}Evaluasi solusi Poisson}{10}{lstlisting.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Problem 2: Persamaan Bratu 1D}{10}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Problem Setup}{10}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Syarat Batas}{10}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Solusi Analitik}{10}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Loss Residual}{10}{subsection.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Arsitektur dan Optimasi}{11}{subsection.4.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Penjelasan Kode Langkah demi Langkah}{12}{subsection.4.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.6.1}Membangun model dengan hard constraint}{12}{subsubsection.4.6.1}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5}Arsitektur PINN untuk persamaan Bratu}{12}{lstlisting.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.6.2}Membentuk turunan dan residual Bratu}{12}{subsubsection.4.6.2}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {6}Automatic differentiation dan residual Bratu}{12}{lstlisting.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.6.3}Menentukan titik kolokasi dan melatih model}{13}{subsubsection.4.6.3}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {7}Titik kolokasi dan optimizer L-BFGS untuk Bratu}{13}{lstlisting.7}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {8}Closure pelatihan Bratu}{13}{lstlisting.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.6.4}Mengevaluasi hasil}{13}{subsubsection.4.6.4}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {9}Evaluasi solusi Bratu}{13}{lstlisting.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Problem 3: Osilator Harmonik Teredam}{14}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Dasar Fisika}{14}{subsection.5.1}\protected@file@percent }
 \citation{beltoforion}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Problem Overview}{2}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Oscillator Harmonik Teredam}{2}{subsection.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Workflow overview}{2}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Syarat Awal}{15}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Solusi Analitik}{15}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Formulasi PINN pada Notebook}{15}{subsection.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Penjelasan Kode Langkah demi Langkah}{16}{subsection.5.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.1}Membangkitkan solusi analitik}{16}{subsubsection.5.5.1}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {10}Solusi analitik osilator harmonik teredam}{16}{lstlisting.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.2}Membangun neural network}{17}{subsubsection.5.5.2}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {11}Arsitektur jaringan pada notebook osilator}{17}{lstlisting.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.3}Mendefinisikan data loss dan physics loss}{17}{subsubsection.5.5.3}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {12}Dua komponen loss pada osilator}{17}{lstlisting.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.4}Menyiapkan data dan titik kolokasi}{18}{subsubsection.5.5.4}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {13}Data berlabel dan titik kolokasi osilator}{18}{lstlisting.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.5}Optimasi tahap pertama dengan Adam}{18}{subsubsection.5.5.5}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {14}Pelatihan awal menggunakan Adam}{18}{lstlisting.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.6}Penyempurnaan dengan L-BFGS}{19}{subsubsection.5.5.6}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {15}Penyempurnaan solusi menggunakan L-BFGS}{19}{lstlisting.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.7}Mengukur galat solusi}{19}{subsubsection.5.5.7}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {16}Metrik evaluasi osilator}{19}{lstlisting.16}\protected@file@percent }
 \bibcite{matlab}{1}
 \bibcite{raissi2019}{2}
 \bibcite{lagaris1998}{3}
 \bibcite{mathworks2024}{4}
 \bibcite{beltoforion}{5}
-\gdef \@abspage@last{4}
+\gdef \@abspage@last{20}
